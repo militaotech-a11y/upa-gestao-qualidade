@@ -1,54 +1,27 @@
-import React, { useState } from 'react'; 
+import React, { useState } from 'react';
 import { 
   Layout, AlertTriangle, Users, ClipboardCheck, Search, 
   RefreshCw, HelpCircle, Database, Save, Activity, 
   CheckCircle2, ChevronRight, FileText, HeartPulse, 
-  Stethoscope, Clock, BarChart3, MessageSquare, ShieldAlert,
+  Stethoscope, Clock, BarChart3, MessageSquare, ShieldAlert, 
   Thermometer, UserMinus, Star, Box 
 } from 'lucide-react';
-
-// ... dentro da função App ...
-const aoSalvar = (e, tipo) => {
-  e.preventDefault();
-  alert("Dados salvos localmente!");
-  e.target.reset();
-};
 
 export default function App() {
   const [aba, setAba] = useState('dashboard');
   const [registros, setRegistros] = useState([]);
-  
-  const [abaInterna, setSubAba] = useState('inventario'); 
+  const [abaInterna, setSubAba] = useState('inventario');
 
-  // --- LOGICA DE BANCO DE DADOS ---
-  const aoSalvar = async (e, tipo) => {
-  e.preventDefault(); // Evita a página recarregar
-  const formData = new FormData(e.target);
-  const dados = Object.fromEntries(formData);
-
-  try {
-    // Aqui a mágica acontece: envia para a coleção "registros" no Firebase
-    await addDoc(collection(db, "registros"), {
+  const aoSalvar = (e, tipo) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const dados = Object.fromEntries(formData);
+    
+    const novoRegistro = {
       ...dados,
-      tipo: tipo,
-      dataCriacao: serverTimestamp()
-    });
-    
-    alert("Dados salvos no Banco de Dados com sucesso!");
-    e.target.reset();
-  } catch (error) {
-    console.error("Erro ao salvar:", error);
-    alert("Erro ao conectar com o banco.");
-};
-    
-    // Adiciona metadados de segurança
-    const novoRegistro = { 
-      ...dados, 
-      tipo, 
-      id: `NQSP-${Date.now()}`, 
+      tipo,
+      id: `NQSP-${Date.now()}`,
       dataHora: new Date().toLocaleString(),
-      usuario: "Administrador NQSP", // Simulação de usuário logado
-      unidade: "UPA Coruripe 24h"
     };
 
     setRegistros([novoRegistro, ...registros]);
