@@ -1,3 +1,6 @@
+import { db } from './firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+
 import React, { useState } from 'react'; 
 import { 
   Layout, AlertTriangle, Users, ClipboardCheck, Search, 
@@ -7,6 +10,29 @@ import {
   Thermometer, UserMinus, Star, Box 
 } from 'lucide-react';
 
+// No topo do arquivo, logo após os outros imports, adicione:
+import { db } from './firebase';
+import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+
+// ... dentro da função App ...
+const aoSalvar = async (e, tipo) => { // O 'async' tem que estar aqui!
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const dados = Object.fromEntries(formData);
+
+  try {
+    await addDoc(collection(db, "registros"), {
+      ...dados,
+      tipo: tipo,
+      dataCriacao: serverTimestamp()
+    });
+    alert("Salvo no banco de dados!");
+    e.target.reset();
+  } catch (error) {
+    console.error("Erro:", error);
+  }
+};
+
 export default function App() {
   const [aba, setAba] = useState('dashboard');
   const [registros, setRegistros] = useState([]);
@@ -14,10 +40,25 @@ export default function App() {
   const [abaInterna, setSubAba] = useState('inventario'); 
 
   // --- LOGICA DE BANCO DE DADOS ---
-  const aoSalvar = (e, tipo) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const dados = Object.fromEntries(formData);
+  const aoSalvar = async (e, tipo) => {
+  e.preventDefault(); // Evita a página recarregar
+  const formData = new FormData(e.target);
+  const dados = Object.fromEntries(formData);
+
+  try {
+    // Aqui a mágica acontece: envia para a coleção "registros" no Firebase
+    await addDoc(collection(db, "registros"), {
+      ...dados,
+      tipo: tipo,
+      dataCriacao: serverTimestamp()
+    });
+    
+    alert("Dados salvos no Banco de Dados com sucesso!");
+    e.target.reset();
+  } catch (error) {
+    console.error("Erro ao salvar:", error);
+    alert("Erro ao conectar com o banco.");
+};
     
     // Adiciona metadados de segurança
     const novoRegistro = { 
@@ -49,10 +90,10 @@ export default function App() {
   );
 
   return (
-    <div className="flex h-screen bg-[#F1F5F9] overflow-hidden font-sans text-slate-700">
+    <div className="flex flex-col md:flex-row min-h-screen bg-[#F1F5F9] overflow-x-hidden">
       
       {/* SIDEBAR */}
-      <aside className="w-72 bg-[#0F172A] text-slate-300 flex flex-col shadow-2xl z-50">
+      <aside className="w-full md:w-72 bg-[#0F172A] flex flex-col shadow-2xl z-50">
         <div className="p-8 bg-[#020617] flex flex-col items-center border-b border-slate-800">
           <div className="w-12 h-12 bg-blue-600 rounded-xl mb-3 flex items-center justify-center shadow-lg">
             <Activity size={28} className="text-white" />
