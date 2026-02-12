@@ -1,6 +1,3 @@
-import { db } from './firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-
 import React, { useState } from 'react'; 
 import { 
   Layout, AlertTriangle, Users, ClipboardCheck, Search, 
@@ -10,27 +7,11 @@ import {
   Thermometer, UserMinus, Star, Box 
 } from 'lucide-react';
 
-// No topo do arquivo, logo após os outros imports, adicione:
-import { db } from './firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-
 // ... dentro da função App ...
-const aoSalvar = async (e, tipo) => { // O 'async' tem que estar aqui!
+const aoSalvar = (e, tipo) => {
   e.preventDefault();
-  const formData = new FormData(e.target);
-  const dados = Object.fromEntries(formData);
-
-  try {
-    await addDoc(collection(db, "registros"), {
-      ...dados,
-      tipo: tipo,
-      dataCriacao: serverTimestamp()
-    });
-    alert("Salvo no banco de dados!");
-    e.target.reset();
-  } catch (error) {
-    console.error("Erro:", error);
-  }
+  alert("Dados salvos localmente!");
+  e.target.reset();
 };
 
 export default function App() {
